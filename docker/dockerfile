@@ -1,20 +1,26 @@
-# Utiliser une image de base
-FROM python:3.12-slim
+# Image de base
+FROM python:3.11-slim
 
-# Définir le répertoire de travail
+# Variables d'environnement pour configurer le comportement de l'interpréteur Python.
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Installer git
+RUN apt-get update && apt-get install -y git
+
+# Definir notre repertoire de travail
+RUN mkdir /app
 WORKDIR /app
 
-# Copier le fichier de dépendances dans le conteneur
-COPY docker/requirements.txt requirements.txt
+# Cloner le projet depuis notre depot distant
+RUN git clone https://github.com/Afdel11/MonProjetDjango.git .
 
-# Installer les dépendances
-RUN pip install -r requirements.txt
+# Mis a jour de pip et installation des dependances du projet
+RUN pip install --upgrade pip
+RUN pip install -r requirement.txt
 
-# Copier le reste de l'application
-COPY . .
-
-# Exposer le port de l'application
+# Exposer le port utiliser par Django
 EXPOSE 8000
 
-# Démarrer l'application
+# Definier la commande par defaut pour executer l'application
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
